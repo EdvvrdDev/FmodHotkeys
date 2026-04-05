@@ -158,7 +158,6 @@ studio.menu.addMenuItem({
     name: "FMOD Hotkeys\\Refresh Modified Assets",
     keySequence: "Shift+Alt+R",
     execute: function() {
-        var window = studio.window.browserCurrent();
         studio.window.triggerAction("RefreshModifiedAssets");
         alert("Assets refreshed!")
     }
@@ -542,6 +541,20 @@ studio.menu.addMenuItem({
         } catch (e) {
             studio.system.message("Error adding bank to event: " + e.message);
         }
+    }
+});
+
+
+//Function 11: Save and then build for all platforms with a single button
+studio.menu.addMenuItem({
+    name: "FMOD Hotkeys\\Save and Build All",
+    keySequence: "F8",
+    execute: function () {
+        // Save the project
+        studio.project.save()
+        // Build for all platforms
+        studio.project.build()
+        alert("Saved and Built for all platforms!");
     }
 });
 
