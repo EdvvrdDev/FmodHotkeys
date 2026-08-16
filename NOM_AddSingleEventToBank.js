@@ -1,5 +1,13 @@
+/* -------------------------------------------
+   NOM - Add Single Event To Bank
+   Add the currently selected event to a bank.
+
+   Credit: nightonmars - FMOD-Organisation-scripts
+   https://github.com/nightonmars/FMOD-Organisation-scripts
+   ------------------------------------------- */
+
 studio.menu.addMenuItem({
-    name: "NOM\\AddSingleEventToBank",
+    name: "FMOD Hotkeys\\NOM\\AddSingleEventToBank",
     keySequence: "Ctrl+B",
     execute: function () {
         //select the event in the browers
@@ -33,6 +41,3 @@ studio.menu.addMenuItem({
         }
     }
 });
-
-
-      

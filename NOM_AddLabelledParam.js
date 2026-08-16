@@ -1,5 +1,14 @@
+/* -------------------------------------------
+   NOM - Add Labelled Param
+   Quick Label Parameter Generator.
+
+   Credit: nightonmars - FMOD-Organisation-scripts
+   https://github.com/nightonmars/FMOD-Organisation-scripts
+   ------------------------------------------- */
+
+//Better add parameter with labels, prompts user for parameter name and labels in a modal dialog, adds the parameter to the currently selected event in the browser
 studio.menu.addMenuItem({
-    name: "NOM\\Add Labelled Param",
+    name: "FMOD Hotkeys\\NOM\\Add Labelled Param",
     keySequence: "Shift+P",
     execute: function () {
         var labelsText = "";

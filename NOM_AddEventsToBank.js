@@ -1,3 +1,12 @@
+/* -------------------------------------------
+   NOM - Add Events To Bank
+   Add multiple events to bank(s), create a new bank,
+   and remove / re-organise events.
+
+   Credit: nightonmars - FMOD-Organisation-scripts
+   https://github.com/nightonmars/FMOD-Organisation-scripts
+   ------------------------------------------- */
+
 var bankPath;
 var newBank;
 var removeBank;
@@ -5,11 +14,9 @@ this.uiEventMacros = function() {
   return execute();
 };
 
-/**
- * Menu item entry
- */
+//Add Multiple Events to banks with a prompt for the bank name, uses the currently selected events in the browser, if no events are selected it will show an error message. Also includes an option to create a new bank and to remove events from a bank.
 studio.menu.addMenuItem({
-  name: "NOM\\Add Events To Bank",
+  name: "FMOD Hotkeys\\NOM\\Add Events To Bank",
   keySequence: "Ctrl+Shift+B",
   execute: execute,
   isEnabled: function() { 
@@ -246,4 +253,3 @@ function execute() {
 
   return out;
 }
-  
