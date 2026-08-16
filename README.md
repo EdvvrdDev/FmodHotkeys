@@ -8,7 +8,7 @@ Each script file contains a single, self-contained functionality - no duplicate 
 | File | Functionality | Hotkey |
 | --- | --- | --- |
 | FmodHotkeys_Regions.js | Create loop / magnet / transition / destination regions and destination markers based on selection | Shift+L, Shift+M, Shift+T, Shift+D, Ctrl+Shift+D |
-| FmodHotkeys_NewEvents.js | Create new event with timeline sheet or action sheet with multi instrument (instead of having to click again to select the sheet type) | Ctrl+Alt+T, Ctrl+Alt+M |
+| FmodHotkeys_NewEvents.js | Create new event with timeline sheet or action sheet (instead of having to click again to select the sheet type) | Ctrl+Alt+T, Ctrl+Alt+Shift+T |
 | FmodHotkeys_ProjectActions.js | Refresh Modified Assets; Save and Build All | Shift+Alt+R, F8 |
 | NOM_AddLabelledParam.js | Quick Label Parameter Generator (by [nightonmars](https://github.com/nightonmars/FMOD-Organisation-scripts)) | Shift+P |
 | NOM_AddEventsToBank.js | Add multiple events to bank(s), create new bank, remove/re-organise events (by [nightonmars](https://github.com/nightonmars/FMOD-Organisation-scripts)) | Ctrl+Shift+B |

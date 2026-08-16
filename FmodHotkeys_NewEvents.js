@@ -15,40 +15,41 @@ studio.menu.addMenuItem({
     }
 });
 
-//Function 2: Add new action sheet event with a multi instrument ready to go
-//Action sheet recipe from FMOD support: https://qa.fmod.com/t/creating-a-multi-instrument-in-an-action/20588
+//Function 2: Add new action sheet event
 studio.menu.addMenuItem({
-    name: "FMOD Hotkeys\\Add new action sheet event with a multi instrument",
+    name: "FMOD Hotkeys\\Add new action sheet event",
     keySequence: "Ctrl+Alt+Shift+T",
     execute: function() {
         var event = studio.project.create("Event");
         event.name = "New Action Event";
 
         // Events created via the scripting API get a timeline sheet by
-        // default (unlike in the GUI) - disable it for a pure action event
-        event.timeline.isProxyEnabled = false;
+        // default (unlike in the GUI) - disable it for a pure action event.
+        // Guarded: some FMOD versions may not support isProxyEnabled.
+        try {
+            if (event.timeline) {
+                event.timeline.isProxyEnabled = false;
+            }
+        } catch (e) {
+            console.warn("FMOD Hotkeys: could not disable timeline sheet: " + e);
+        }
 
-        // Parent the action sheet to the event FIRST - otherwise the
-        // instrument link below is dropped when the sheet gets re-parented
+        // Add an action sheet to the event
         var actionSheet = studio.project.create("ActionSheet");
         event.relationships.parameters.add(actionSheet);
 
-        // Link a multi instrument into the sheet. 'modules' is a to-many
-        // relationship, so assign it via the relationship API; direct
-        // assignment (actionSheet.modules = sound) silently gets lost.
-        var sound = studio.project.create("MultiSound");
-        var linked = false;
-        try {
-            actionSheet.relationships.modules.add(sound);
-            linked = actionSheet.modules && actionSheet.modules.length > 0;
-        } catch (e) { linked = false; }
-        if (!linked) {
-            actionSheet.modules = sound;
-        }
-
-        // Route the instrument through the event's master track
+        // An action sheet is implemented as a multi instrument internally:
+        // it is INVALID while its root instrument (actionSheet.modules) is
+        // empty - FMOD flags the event as malformed on save. The GUI creates
+        // this root automatically; the API does not, so assign one. The root
+        // is not a visible instrument box, the sheet still looks empty.
+        var root = studio.project.create("MultiSound");
+        actionSheet.modules = root;
         if (event.masterTrack) {
-            sound.audioTrack = event.masterTrack;
+            root.audioTrack = event.masterTrack;
+        }
+        if (!actionSheet.modules) {
+            console.error("FMOD Hotkeys: action sheet root did not attach - the event will be flagged as malformed");
         }
     }
 });
