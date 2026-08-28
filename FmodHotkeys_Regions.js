@@ -42,13 +42,22 @@ function FH_getSelectionEvent(selection) {
         }
     }
 
-    // 2) Fallback: the browser's current item is an event (Events tab active)
+    // 2) Fallback: the event selected in the "Events" browser tab -
+    //    readable even when another browser tab (e.g. Assets) is focused
+    try {
+        var eventsTabItem = studio.window.browserCurrent("Events");
+        if (FH_isEvent(eventsTabItem)) {
+            return eventsTabItem;
+        }
+    } catch (e) { /* tabName parameter may not be supported - ignore */ }
+
+    // 3) Fallback: whatever the active browser tab has selected
     var browserItem = studio.window.browserCurrent();
     if (FH_isEvent(browserItem)) {
         return browserItem;
     }
 
-    // 3) Fallback: whatever the editor currently has focused
+    // 4) Fallback: whatever the editor currently has focused
     var editorItem = studio.window.editorCurrent();
     if (FH_isEvent(editorItem)) {
         return editorItem;
