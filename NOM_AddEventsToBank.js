@@ -27,6 +27,7 @@ studio.menu.addMenuItem({
 function execute() {
   var objects = studio.window.browserSelection();
   var out = [];
+  bankPath = "bank:/Master"; // default target bank, matches the pre-filled dialog field
 //  var events = "";
 
   if(objects.length > 0) {
@@ -185,7 +186,7 @@ function execute() {
         widgetType: studio.ui.widgetType.LineEdit,
         column: 0,
         row: rowIndex + 7,
-        text: "bank:/",
+        text: "bank:/Master", // pre-filled default; bankPath is initialized to the same value in execute()
         onTextEdited: function() {
           bankPath = this.text();
         }

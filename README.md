@@ -11,7 +11,7 @@ Each script file contains a single, self-contained functionality - no duplicate 
 | FmodHotkeys_NewEvents.js | Create new event with timeline sheet or action sheet (instead of having to click again to select the sheet type) | Ctrl+Alt+T, Ctrl+Alt+Shift+T |
 | FmodHotkeys_ProjectActions.js | Refresh Modified Assets; Save and Build All | Shift+Alt+R, F8 |
 | NOM_AddLabelledParam.js | Quick Label Parameter Generator (by [nightonmars](https://github.com/nightonmars/FMOD-Organisation-scripts)) | Shift+P |
-| NOM_AddEventsToBank.js | Add multiple events to bank(s), create new bank, remove/re-organise events (by [nightonmars](https://github.com/nightonmars/FMOD-Organisation-scripts)) | Ctrl+Shift+B |
+| NOM_AddEventsToBank.js | Add multiple events to bank(s), create new bank, remove/re-organise events - defaults to the Master bank (by [nightonmars](https://github.com/nightonmars/FMOD-Organisation-scripts)) | Ctrl+Shift+B |
 | NOM_AddSingleEventToBank.js | Add single event to a bank (by [nightonmars](https://github.com/nightonmars/FMOD-Organisation-scripts)) | Ctrl+B |
 | ObjectIdentifier.js | Bonus dev tool: dumps info about selected objects to the console | Alt+I |
 
