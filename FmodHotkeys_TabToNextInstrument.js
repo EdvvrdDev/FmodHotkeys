@@ -10,23 +10,13 @@
 
 // Returns the event selected in the "Events" browser tab, regardless of
 // which browser tab is currently focused (Events/Assets/...), so this
-// hotkey works from any tab.
+// hotkey works from any tab. Returns null when no event is selected
+// in the Events tab.
 function FH_getEventsTabEvent() {
     try {
         var event = studio.window.browserCurrent("Events");
-        if (event && event.isOfExactType("Event")) {
-            return event;
-        }
-        console.log("[TabNext] Events tab lookup returned no event - falling back to active tab");
-    } catch (e) {
-        console.warn("[TabNext] browserCurrent(\"Events\") failed: " + e + " - falling back to active tab");
-    }
-    // Fallback: whatever the active browser tab has selected
-    var current = studio.window.browserCurrent();
-    if (current && current.isOfExactType("Event")) {
-        return current;
-    }
-    return null;
+        return (event && event.isOfExactType("Event")) ? event : null;
+    } catch (e) { return null; }
 }
 
 studio.menu.addMenuItem({

@@ -5,15 +5,7 @@ Please feel free to request new functionalities or suggest fixes to help me impr
 ## Script organization
 Each script file contains a single, self-contained functionality - no duplicate menu items, hotkeys or global variables across files. Copy only the files you want into your FMOD Scripts folder.
 
-| File | Functionality | Hotkey |
-| --- | --- | --- |
-| FmodHotkeys_Regions.js | Create loop / magnet / transition / destination regions and destination markers based on selection | Shift+L, Shift+M, Shift+T, Shift+D, Ctrl+Shift+D |
-| FmodHotkeys_NewEvents.js | Create new event with timeline sheet or action sheet (instead of having to click again to select the sheet type) | Ctrl+Alt+T, Ctrl+Alt+Shift+T |
-| FmodHotkeys_ProjectActions.js | Refresh Modified Assets; Save and Build All | Shift+Alt+R, F8 |
-| NOM_AddLabelledParam.js | Quick Label Parameter Generator (by [nightonmars](https://github.com/nightonmars/FMOD-Organisation-scripts)) | Shift+P |
-| NOM_AddEventsToBank.js | Add multiple events to bank(s), create new bank, remove/re-organise events - defaults to the Master bank (by [nightonmars](https://github.com/nightonmars/FMOD-Organisation-scripts)) | Ctrl+Shift+B |
-| NOM_AddSingleEventToBank.js | Add single event to a bank (by [nightonmars](https://github.com/nightonmars/FMOD-Organisation-scripts)) | Ctrl+B |
-| ObjectIdentifier.js | Bonus dev tool: dumps info about selected objects to the console | Alt+I |
+See **[FEATURES.md](FEATURES.md)** for the full hotkey list.
 
 Scripts prefixed with `NOM_` are courtesy of https://github.com/nightonmars/FMOD-Organisation-scripts - credit and thanks to nightonmars!
 

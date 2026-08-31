@@ -10,9 +10,6 @@
 var bankPath;
 var newBank;
 var removeBank;
-this.uiEventMacros = function() {
-  return execute();
-};
 
 //Add Multiple Events to banks with a prompt for the bank name, uses the currently selected events in the browser, if no events are selected it will show an error message. Also includes an option to create a new bank and to remove events from a bank.
 studio.menu.addMenuItem({
@@ -26,7 +23,6 @@ studio.menu.addMenuItem({
 
 function execute() {
   var objects = studio.window.browserSelection();
-  var out = [];
   bankPath = "bank:/Master"; // default target bank, matches the pre-filled dialog field
 //  var events = "";
 
@@ -43,8 +39,6 @@ function execute() {
 
     objects.forEach(function(object, index) {
       if(object.isOfExactType("Event")) {
-        out.push(object);
-        
         items.push(
           {
             widgetType: studio.ui.widgetType.LineEdit,
@@ -57,11 +51,6 @@ function execute() {
             }
           }
         );
-
-        // Get the event path
-        var eventPath = object.getPath().length; 
-        if (!eventPath) {         
-        console.log("event found path " +eventPath);} 
         }
     });
 
@@ -210,9 +199,7 @@ function execute() {
           var bank = studio.project.lookup(bankPath);
           if (!bank) {
             studio.system.message("Bank not found: " + bank);
-            }
-            else{
-            };
+          }
             //find the event path
             var eventPaths = objects.map(function(object) {
             return object.getPath();
@@ -251,6 +238,4 @@ function execute() {
   } else {
     console.error("Error: browser selection empty.");
   }
-
-  return out;
 }

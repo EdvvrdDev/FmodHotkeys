@@ -10,11 +10,8 @@ function FH_isEvent(obj) {
     return !!(obj && obj.isOfExactType && obj.isOfExactType("Event"));
 }
 
-// Resolves the Event that owns the given timeline selection.
-// This intentionally does NOT rely on studio.window.browserCurrent(),
-// because that returns whatever is selected in the active browser tab
-// (e.g. an audio asset when the Assets tab is focused), which used to
-// disable these hotkeys unless the Events tab was active.
+// Resolves the Event that owns the given timeline selection, without
+// depending on which browser tab is focused.
 function FH_getSelectionEvent(selection) {
     // 1) Resolve from the selected timeline items themselves
     for (var i = 0; i < selection.length; i++) {
@@ -43,26 +40,13 @@ function FH_getSelectionEvent(selection) {
     }
 
     // 2) Fallback: the event selected in the "Events" browser tab -
-    //    readable even when another browser tab (e.g. Assets) is focused
+    //    works even when another browser tab (e.g. Assets) is focused
     try {
         var eventsTabItem = studio.window.browserCurrent("Events");
         if (FH_isEvent(eventsTabItem)) {
             return eventsTabItem;
         }
-    } catch (e) { /* tabName parameter may not be supported - ignore */ }
-
-    // 3) Fallback: whatever the active browser tab has selected
-    var browserItem = studio.window.browserCurrent();
-    if (FH_isEvent(browserItem)) {
-        return browserItem;
-    }
-
-    // 4) Fallback: whatever the editor currently has focused
-    var editorItem = studio.window.editorCurrent();
-    if (FH_isEvent(editorItem)) {
-        return editorItem;
-    }
-
+    } catch (e) { /* tabName parameter not supported - no fallback */ return null; }
     return null;
 }
 

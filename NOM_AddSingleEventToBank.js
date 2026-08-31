@@ -10,19 +10,14 @@ studio.menu.addMenuItem({
     name: "FMOD Hotkeys\\NOM\\AddSingleEventToBank",
     keySequence: "Ctrl+B",
     execute: function () {
-        //select the event in the browers
+        //select the event in the browser
        var event = studio.window.browserCurrent();
-        
-       //gets the path and sets it to the var
-       var eventPath = event.getPath()
+
        // Prompt the user for the bank path
        var bankPath = studio.system.getText("Enter the bank path:", "bank:/Master");
-      
 
-        // Find the event
-        var event = studio.project.lookup(eventPath);
-        if (!event) {
-            studio.system.message("Event not found: " + eventPath);
+       if (!event) {
+            studio.system.message("No event selected in the browser.");
             return;
         }
 
