@@ -16,32 +16,12 @@ Scripts prefixed with `NOM_` are courtesy of <https://github.com/nightonmars/FMO
 
 ## Highlighted scripts
 
-- **FmodHotkeys_BatchEditTransitions.js** — `Shift + X` opens a dialog to batch edit transition markers/regions: re-target them to a destination (auto-named after it), add parameter conditions (float ranges or label names), switch AND/OR trigger logic, and clear all conditions in one click.
+- **FmodHotkeys_BatchEditTransitions.js** — `Shift + X` opens a dialog to batch edit transition markers/regions: re-target them to a destination (auto-named after it), add parameter conditions (float ranges or label names), switch AND/OR trigger logic, and clear all conditions in one click. `X` tweaks existing condition min/max values directly, one field pair per trigger condition.
 
 - More to come!
-
-## Instruction from FMOD documentation
-
-Script files are automatically evaluated every time you load a project. FMOD Studio reads scripts from any files with the .js extension in the following locations:
-
-### System scripts directory
-
-- Windows: %localappdata%/FMOD Studio/Scripts
-- Mac: ~/Library/Preferences/FMOD Studio/Scripts
-- Linux: ~/.config/fmod-studio/Scripts
-
-### Built-in scripts directory
-
-- Windows: %fmod_install_directory%/Scripts
-- Mac: %fmod_bundle%/Scripts
-- Linux: %fmod_install_directory%/Scripts
-
-### Project scripts directory
-
-- %project_root_directory%/Scripts
-
-After adding or altering a script in one of these directories, you can select "Scripts > Reload" to use the newly updated script.
 
 ## Bonus script
 
 I also made an identifier script to help me understand Fmod better so I can add more functionalities. All the info is dumped into the console window
+
+Advanced users can skip the installer entirely - FMOD's own documentation explains how the script directories work if you'd rather wire things up yourself.
