@@ -1,11 +1,10 @@
 /* -------------------------------------------
-   FMOD Hotkeys - Tab to Next Instrument (DEBUG/TEST)
-   Pro Tools style navigation: moves the timeline cursor
-   ("playhead") to the start of the next instrument on the
-   timeline of the current event.
-
-   NOTE: bound to Tab for now - if FMOD/Qt swallows Tab for
-   focus navigation, we may need to rebind (e.g. Ctrl+Right).
+   FMOD Hotkeys - Tab Instrument Navigation (DEBUG/TEST)
+   Pro Tools style timeline navigation:
+   - Tab: cursor to the start of the next instrument
+   - Shift+Tab: cursor to the end of the previous instrument
+   (Plain Tab is safe - no tab-based navigation exists in
+   FMOD Studio to collide with.)
    ------------------------------------------- */
 
 // Returns the event selected in the "Events" browser tab, regardless of
@@ -15,62 +14,99 @@
 function FH_getEventsTabEvent() {
     try {
         var event = studio.window.browserCurrent("Events");
-        return (event && event.isOfExactType("Event")) ? event : null;
-    } catch (e) { return null; }
+        return event && event.isOfExactType("Event") ? event : null;
+    } catch {
+        return null;
+    }
+}
+
+// Moves the timeline cursor: backwards = snap to the end of the previous
+// instrument, forwards = snap to the start of the next one. Instruments
+// without a usable length contribute their start only (no snap end).
+function FH_snapCursor(event, backwards) {
+    try {
+        var starts = [];
+        var ends = [];
+        (event.groupTracks || []).forEach((track) => {
+            (track.modules || []).forEach((module) => {
+                starts.push(module.start);
+                if (typeof module.length === "number" && module.length > 0) {
+                    ends.push(module.start + module.length);
+                }
+            });
+        });
+        console.log(
+            "[TabNext] Instrument starts: " +
+                (starts.length ? starts.join(", ") : "(none)"),
+        );
+
+        var cursor = event.getCursorPosition(event.timeline);
+        console.log("[TabNext] Cursor at: " + cursor);
+
+        // Epsilon so that sitting exactly on a snap point moves to the
+        // next/previous one instead of staying in place.
+        var EPSILON = 0.0001;
+        var target = null;
+        if (backwards) {
+            ends.forEach((end) => {
+                if (
+                    end < cursor - EPSILON &&
+                    (target === null || end > target)
+                ) {
+                    target = end;
+                }
+            });
+        } else {
+            starts.forEach((start) => {
+                if (
+                    start > cursor + EPSILON &&
+                    (target === null || start < target)
+                ) {
+                    target = start;
+                }
+            });
+        }
+
+        if (target === null) {
+            console.log(
+                backwards
+                    ? "[TabNext] No instrument end before the cursor - staying put."
+                    : "[TabNext] No instrument after the cursor - staying put.",
+            );
+            return;
+        }
+
+        event.setCursorPosition(event.timeline, target);
+        console.log("[TabNext] Cursor moved to: " + target);
+    } catch (e) {
+        console.error("[TabNext] Failed: " + e);
+    }
 }
 
 studio.menu.addMenuItem({
     name: "FMOD Hotkeys\\Move Cursor to Next Instrument",
     keySequence: "Tab",
-    isEnabled: function() {
-        return FH_getEventsTabEvent() !== null;
-    },
-    execute: function() {
-        try {
-            var event = FH_getEventsTabEvent();
-            if (!event) {
-                console.warn("[TabNext] No event found (tried Events tab and active tab).");
-                return;
-            }
-
-            // Collect the start times of all instruments on all tracks
-            var starts = [];
-            (event.groupTracks || []).forEach(function(track) {
-                (track.modules || []).forEach(function(module) {
-                    starts.push(module.start);
-                });
-            });
-            console.log("[TabNext] Instrument starts: " + (starts.length ? starts.join(", ") : "(none)"));
-
-            if (starts.length === 0) {
-                console.warn("[TabNext] Event '" + event.name + "' has no instruments.");
-                return;
-            }
-
-            // Current cursor position on the timeline (seconds)
-            var cursor = event.getCursorPosition(event.timeline);
-            console.log("[TabNext] Cursor at: " + cursor);
-
-            // Find the closest start AFTER the cursor. Small epsilon so that
-            // when the cursor sits exactly on an instrument start, Tab moves
-            // on to the following one instead of staying in place.
-            var EPSILON = 0.0001;
-            var next = null;
-            starts.forEach(function(start) {
-                if (start > cursor + EPSILON && (next === null || start < next)) {
-                    next = start;
-                }
-            });
-
-            if (next === null) {
-                console.log("[TabNext] No instrument after the cursor - staying put.");
-                return;
-            }
-
-            event.setCursorPosition(event.timeline, next);
-            console.log("[TabNext] Cursor moved to: " + next);
-        } catch (e) {
-            console.error("[TabNext] Failed: " + e);
+    isEnabled: () => FH_getEventsTabEvent() !== null,
+    execute: () => {
+        var event = FH_getEventsTabEvent();
+        if (event) {
+            FH_snapCursor(event, false);
+        } else {
+            console.warn("[TabNext] No event found in the Events tab.");
         }
-    }
+    },
+});
+
+studio.menu.addMenuItem({
+    name: "FMOD Hotkeys\\Move Cursor to Previous Instrument End",
+    keySequence: "Shift+Tab",
+    isEnabled: () => FH_getEventsTabEvent() !== null,
+    execute: () => {
+        var event = FH_getEventsTabEvent();
+        if (event) {
+            FH_snapCursor(event, true);
+        } else {
+            console.warn("[TabNext] No event found in the Events tab.");
+        }
+    },
 });

@@ -6,7 +6,7 @@
 //Function 1: Refresh Modified Assets
 studio.menu.addMenuItem({
     name: "FMOD Hotkeys\\Refresh Modified Assets",
-    keySequence: "Shift+Alt+R",
+    keySequence: "F9",
     execute: function () {
         studio.window.triggerAction("RefreshModifiedAssets");
         studio.system.message("Assets refreshed!");

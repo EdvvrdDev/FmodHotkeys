@@ -16,7 +16,9 @@ function FH_getSelectionEvent(selection) {
     // 1) Resolve from the selected timeline items themselves
     for (var i = 0; i < selection.length; i++) {
         var element = selection[i];
-        if (!element) { continue; }
+        if (!element) {
+            continue;
+        }
 
         // The selection itself is an event
         if (FH_isEvent(element)) {
@@ -46,7 +48,9 @@ function FH_getSelectionEvent(selection) {
         if (FH_isEvent(eventsTabItem)) {
             return eventsTabItem;
         }
-    } catch (e) { /* tabName parameter not supported - no fallback */ return null; }
+    } catch (e) {
+        /* tabName parameter not supported - no fallback */ return null;
+    }
     return null;
 }
 
@@ -57,137 +61,96 @@ function FH_hasTimelineSelection() {
     return selection.length > 0 && FH_getSelectionEvent(selection) !== null;
 }
 
+// Shared by all region/marker hotkeys: one MarkerTrack per run, one item
+// per selected timeline element. propsFn(event) returns extra properties
+// (e.g. { selector: event, looping: 2 }). NamedMarkers have no length
+// property, so setting length is skipped for them automatically.
+function FH_addTimelineItems(entityName, namePrefix, propsFn) {
+    var selections = studio.window.editorSelection();
+    var event = FH_getSelectionEvent(selections);
+    if (!event) {
+        return;
+    }
+
+    var track = studio.project.create("MarkerTrack");
+    track.event = event;
+
+    selections.forEach((element, index) => {
+        var item = studio.project.create(entityName);
+        item.name = namePrefix + " " + (index + 1);
+        item.position = element.start;
+        if (item.length !== undefined) {
+            item.length = element.length;
+        }
+        item.timeline = event.timeline;
+        item.markerTrack = track;
+        if (propsFn) {
+            var props = propsFn(event);
+            for (var key in props) {
+                item[key] = props[key];
+            }
+        }
+    });
+}
+
 //Function 1: Add Loop Region to all currently selected Event
 studio.menu.addMenuItem({
     name: "FMOD Hotkeys\\Add Loop Region to selections",
     keySequence: "Shift+L",
-    isEnabled: function() { return FH_hasTimelineSelection(); },
-    execute: function() {
-        // Retrieve the current selections and resolve the event that owns them
-        var selections = studio.window.editorSelection();
-        var event = FH_getSelectionEvent(selections);
-        if (!event) { return; }
-        var timeLine = event.timeline;
-        
-        var track = studio.project.create("MarkerTrack");
-        track.event = event;
-
-        selections.forEach(function(element, index) {
-            var loopRegion = studio.project.create("LoopRegion");
-            loopRegion.name = "Loop Region " + (index + 1);
-            loopRegion.position = element.start;
-            loopRegion.length = element.length;
-            loopRegion.selector = event;
-            loopRegion.timeline = timeLine;
-            loopRegion.markerTrack = track;
-        });
-    }
+    isEnabled: () => FH_hasTimelineSelection(),
+    execute: () => {
+        FH_addTimelineItems("LoopRegion", "Loop Region", (event) => ({
+            selector: event,
+        }));
+    },
 });
 
 //Function 2: Add Magnet Region to all currently selected Event
 studio.menu.addMenuItem({
     name: "FMOD Hotkeys\\Add Magnet Region to selections",
     keySequence: "Shift+M",
-    isEnabled: function() { return FH_hasTimelineSelection(); },
-    execute: function() {
-        // Retrieve the current selections and resolve the event that owns them
-        var selections = studio.window.editorSelection();
-        var event = FH_getSelectionEvent(selections);
-        if (!event) { return; }
-        var timeLine = event.timeline;
-        
-        var track = studio.project.create("MarkerTrack");
-        track.event = event;
-
-        selections.forEach(function(element, index) {
-            var loopRegion = studio.project.create("LoopRegion");
-            loopRegion.name = "Magnet Region " + (index + 1);
-            loopRegion.position = element.start;
-            loopRegion.length = element.length;
-            loopRegion.looping = 2; // Magnet Region
-            loopRegion.timeline = timeLine;
-            loopRegion.markerTrack = track;
+    isEnabled: () => FH_hasTimelineSelection(),
+    execute: () => {
+        FH_addTimelineItems("LoopRegion", "Magnet Region", () => {
+            return { looping: 2 }; // Magnet Region
         });
-    }
+    },
 });
 
 //Function 3: Add Transition Region to selections
 studio.menu.addMenuItem({
     name: "FMOD Hotkeys\\Add Transition Region to selections",
     keySequence: "Shift+T",
-    isEnabled: function() { return FH_hasTimelineSelection(); },
-    execute: function() {
-        // Retrieve the current selections and resolve the event that owns them
-        var selections = studio.window.editorSelection();
-        var event = FH_getSelectionEvent(selections);
-        if (!event) { return; }
-        var timeLine = event.timeline;
-        
-        var track = studio.project.create("MarkerTrack");
-        track.event = event;
-
-        selections.forEach(function(element, index) {
-            var TransitionRegion = studio.project.create("TransitionRegion");
-            TransitionRegion.name = "Transition Region " + (index + 1);
-            TransitionRegion.position = element.start;
-            TransitionRegion.length = element.length;
-            TransitionRegion.selector = event;
-            TransitionRegion.timeline = timeLine;
-            TransitionRegion.markerTrack = track;
-        });
-    }
+    isEnabled: () => FH_hasTimelineSelection(),
+    execute: () => {
+        FH_addTimelineItems(
+            "TransitionRegion",
+            "Transition Region",
+            (event) => ({ selector: event }),
+        );
+    },
 });
 
 //Function 4: Add Destination Region to selections
 studio.menu.addMenuItem({
     name: "FMOD Hotkeys\\Add Destination Region to selections",
     keySequence: "Shift+D",
-    isEnabled: function() { return FH_hasTimelineSelection(); },
-    execute: function() {
-        // Retrieve the current selections and resolve the event that owns them
-        var selections = studio.window.editorSelection();
-        var event = FH_getSelectionEvent(selections);
-        if (!event) { return; }
-        var timeLine = event.timeline;
-        
-        var track = studio.project.create("MarkerTrack");
-        track.event = event;
-
-        selections.forEach(function(element, index) {
-            var DestinationRegion = studio.project.create("LoopRegion");
-            DestinationRegion.name = "Destination Region " + (index + 1);
-            DestinationRegion.looping = 0; // non looping aka destination region
-            DestinationRegion.position = element.start;
-            DestinationRegion.length = element.length;
-            DestinationRegion.selector = event;
-            DestinationRegion.timeline = timeLine;
-            DestinationRegion.markerTrack = track;
+    isEnabled: () => FH_hasTimelineSelection(),
+    execute: () => {
+        FH_addTimelineItems("LoopRegion", "Destination Region", (event) => {
+            return { looping: 0, selector: event }; // non looping aka destination region
         });
-    }
+    },
 });
 
 //Function 5: Add Destination Marker to selections
 studio.menu.addMenuItem({
     name: "FMOD Hotkeys\\Add Destination Marker to start of selections",
     keySequence: "Ctrl+Shift+D",
-    isEnabled: function() { return FH_hasTimelineSelection(); },
-    execute: function() {
-        // Retrieve the current selections and resolve the event that owns them
-        var selections = studio.window.editorSelection();
-        var event = FH_getSelectionEvent(selections);
-        if (!event) { return; }
-        var timeLine = event.timeline;
-        
-        var track = studio.project.create("MarkerTrack");
-        track.event = event;
-
-        selections.forEach(function(element, index) {
-            var DestinationMarker = studio.project.create("NamedMarker");
-            DestinationMarker.name = "Destination Marker " + (index + 1);
-            DestinationMarker.position = element.start;
-            DestinationMarker.selector = event;
-            DestinationMarker.timeline = timeLine;
-            DestinationMarker.markerTrack = track;
-        });
-    }
+    isEnabled: () => FH_hasTimelineSelection(),
+    execute: () => {
+        FH_addTimelineItems("NamedMarker", "Destination Marker", (event) => ({
+            selector: event,
+        }));
+    },
 });

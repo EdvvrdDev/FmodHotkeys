@@ -136,7 +136,7 @@ function execute() {
                         bankToRemove.relationships.events.remove(event);
                     } catch (e) {
                         studio.system.message(
-                            "Error removing event from bank: ",
+                            "Error removing event from bank: " + e.message,
                         );
                     }
                 }); // Close the forEach loop

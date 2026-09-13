@@ -113,6 +113,24 @@ function FHB_parameterLabel(p) {
     return p.name || p.id;
 }
 
+// Display a value without float round-trip noise (0.30000000000000004 -> 0.3).
+// Rounding to 6 decimals is cosmetic only - stored values keep full precision.
+function FHB_formatValue(v) {
+    return typeof v === "number"
+        ? String(Math.round(v * 1e6) / 1e6)
+        : String(v);
+}
+
+// Numeric for continuous parameters, label string for labelled ones
+function FHB_parseValue(text, fallback) {
+    const trimmed = text.trim();
+    if (trimmed === "") {
+        return fallback;
+    }
+    const num = parseFloat(trimmed);
+    return Number.isNaN(num) ? trimmed : num;
+}
+
 studio.menu.addMenuItem({
     name: "FMOD Hotkeys\\Batch Edit Transitions",
     keySequence: "Shift+X",
@@ -182,10 +200,12 @@ studio.menu.addMenuItem({
                 },
                 {
                     widgetType: studio.ui.widgetType.PushButton,
-                    column: 1,
-                    row: 5,
+                    column: 0,
+                    row: 6,
+                    sizePolicy: studio.ui.sizePolicy.Expanding,
                     text: "Browse...",
-                    onClicked: () => {
+                    // `this` must be the dialog for findWidget - no arrow function
+                    onClicked: function () {
                         const presets = FHB_collectParameters();
                         if (presets.length === 0) {
                             studio.system.message(
@@ -246,7 +266,11 @@ studio.menu.addMenuItem({
                             ],
                         });
                         if (chosen) {
-                            // Stored internally; the text field is for manual entry only
+                            // Show the selection in the field (setText first: it fires
+                            // onTextEdited, which clears the stored pick)
+                            this.findWidget("m_parameter").setText(
+                                FHB_parameterLabel(chosen),
+                            );
                             parameterObject = chosen;
                             parameterPath = FHB_parameterLabel(chosen);
                             studio.system.message(
@@ -258,39 +282,39 @@ studio.menu.addMenuItem({
                 {
                     widgetType: studio.ui.widgetType.Label,
                     column: 0,
-                    row: 6,
+                    row: 7,
                     text: "Min (float, or label index):",
                 },
                 {
                     widgetType: studio.ui.widgetType.LineEdit,
                     column: 0,
-                    row: 7,
+                    row: 8,
                     widgetId: "m_min",
                     text: "0",
                 },
                 {
                     widgetType: studio.ui.widgetType.Label,
                     column: 0,
-                    row: 8,
+                    row: 9,
                     text: "Max (blank = same as min):",
                 },
                 {
                     widgetType: studio.ui.widgetType.LineEdit,
                     column: 0,
-                    row: 9,
+                    row: 10,
                     widgetId: "m_max",
                     text: "1",
                 },
                 {
                     widgetType: studio.ui.widgetType.Label,
                     column: 0,
-                    row: 10,
+                    row: 11,
                     text: "Trigger condition mode:",
                 },
                 {
                     widgetType: studio.ui.widgetType.ComboBox,
                     column: 0,
-                    row: 11,
+                    row: 12,
                     widgetId: "m_condition",
                     items: [
                         { text: "(unchanged)" },
@@ -302,7 +326,7 @@ studio.menu.addMenuItem({
                 {
                     widgetType: studio.ui.widgetType.PushButton,
                     column: 0,
-                    row: 12,
+                    row: 13,
                     text: "Apply to all",
                     onClicked: function () {
                         const destinationName =
@@ -383,20 +407,11 @@ studio.menu.addMenuItem({
                                 );
                             }
                         }
-                        // Numeric for continuous parameters, label string for labelled ones
-                        const parseValue = (text, fallback) => {
-                            const trimmed = text.trim();
-                            if (trimmed === "") {
-                                return fallback;
-                            }
-                            const num = parseFloat(trimmed);
-                            return Number.isNaN(num) ? trimmed : num;
-                        };
-                        const min = parseValue(
+                        const min = FHB_parseValue(
                             this.findWidget("m_min").text(),
                             0,
                         );
-                        const max = parseValue(
+                        const max = FHB_parseValue(
                             this.findWidget("m_max").text(),
                             undefined,
                         ); // blank max = same as min (per docs)
@@ -440,7 +455,7 @@ studio.menu.addMenuItem({
                 {
                     widgetType: studio.ui.widgetType.PushButton,
                     column: 0,
-                    row: 13,
+                    row: 14,
                     text: "Clear all conditions",
                     onClicked: function () {
                         let cleared = 0;
@@ -468,6 +483,190 @@ studio.menu.addMenuItem({
                     },
                 },
             ],
+        });
+    },
+});
+
+/* -------------------------------------------
+   FMOD Hotkeys - Edit Transition Condition Values
+   Companion to Batch Edit Transitions: only tweaks the min/max
+   range of existing parameter conditions, typed in directly.
+   One min/max pair per condition found on the selected transitions.
+   Select transitions (or anything inside an event that owns
+   transitions) and press X.
+   ------------------------------------------- */
+
+// Short row label: a condition's `parameter` is usually a bare GameParameter
+// (no name, no path - that's where the hex GUIDs came from). Resolve the name
+// from its owning ParameterPreset instead.
+function FHB_shortParamName(p) {
+    if (p && p.name) {
+        return p.name;
+    }
+    if (p && p.isValid) {
+        const preset =
+            studio.project.model.ParameterPreset.findInstances().find(
+                (o) => o.parameter && o.parameter.id === p.id,
+            );
+        if (preset) {
+            return preset.name;
+        }
+    }
+    return "?";
+}
+
+studio.menu.addMenuItem({
+    name: "FMOD Hotkeys\\Edit Transition Condition Values",
+    keySequence: "X",
+    isEnabled: () => studio.window.editorSelection().length > 0,
+    execute: () => {
+        const selection = studio.window.editorSelection();
+        const transitions = FHB_getTransitions(selection);
+
+        // One row per trigger condition across all selected transitions
+        const rows = [];
+        transitions.forEach((transition) =>
+            (transition.triggerConditions || []).forEach((condition) => {
+                if (condition) {
+                    rows.push({ transition, condition });
+                }
+            }),
+        );
+        if (rows.length === 0) {
+            studio.system.message(
+                "No parameter conditions found on the selected transitions. Use Shift+X to add conditions first.",
+            );
+            return;
+        }
+
+        // Build the grid dynamically: min | max per condition
+        const items = [
+            {
+                widgetType: studio.ui.widgetType.Label,
+                column: 0,
+                row: 0,
+                text: `${rows.length} condition(s) on ${transitions.length} transition(s).`,
+            },
+            {
+                widgetType: studio.ui.widgetType.Label,
+                column: 1,
+                row: 0,
+                text: "Blank = keep current.",
+            },
+            {
+                widgetType: studio.ui.widgetType.Label,
+                column: 1,
+                row: 1,
+                text: "Min",
+            },
+            {
+                widgetType: studio.ui.widgetType.Label,
+                column: 2,
+                row: 1,
+                text: "Max",
+            },
+        ];
+        rows.forEach((row, i) => {
+            items.push({
+                widgetType: studio.ui.widgetType.Label,
+                column: 0,
+                row: i + 2,
+                text: `${FHB_shortParamName(row.condition.parameter)}:`,
+            });
+            items.push({
+                widgetType: studio.ui.widgetType.LineEdit,
+                column: 1,
+                row: i + 2,
+                widgetId: `m_min_${i}`,
+                text: FHB_formatValue(row.condition.minimum),
+            });
+            items.push({
+                widgetType: studio.ui.widgetType.LineEdit,
+                column: 2,
+                row: i + 2,
+                widgetId: `m_max_${i}`,
+                text: FHB_formatValue(row.condition.maximum),
+            });
+        });
+        items.push({
+            widgetType: studio.ui.widgetType.PushButton,
+            column: 0,
+            row: rows.length + 3,
+            sizePolicy: studio.ui.sizePolicy.Expanding,
+            text: "Apply",
+            onClicked: function () {
+                let updated = 0;
+                rows.forEach((row, i) => {
+                    const min = FHB_parseValue(
+                        this.findWidget(`m_min_${i}`).text(),
+                        row.condition.minimum,
+                    );
+                    const max = FHB_parseValue(
+                        this.findWidget(`m_max_${i}`).text(),
+                        row.condition.maximum,
+                    );
+                    try {
+                        row.condition.minimum = min;
+                        row.condition.maximum = max;
+                        updated++;
+                    } catch (e) {
+                        studio.system.message(
+                            `Failed to update condition ${i + 1}: ${e.message}`,
+                        );
+                    }
+                });
+                studio.system.message(`Updated ${updated} condition(s).`);
+                this.closeDialog();
+            },
+        });
+        items.push({
+            widgetType: studio.ui.widgetType.PushButton,
+            column: 1,
+            columnSpan: 2,
+            row: rows.length + 3,
+            sizePolicy: studio.ui.sizePolicy.Expanding,
+            text: "Reset",
+            onClicked: function () {
+                let reset = 0;
+                rows.forEach((row, i) => {
+                    const p = row.condition.parameter;
+                    // Labelled parameters: min is a label string, numeric range
+                    // doesn't apply (parameterType 2 = labelled)
+                    if (!p || !p.isValid || p.parameterType === 2) {
+                        return;
+                    }
+                    try {
+                        const min = p.minimum === undefined ? 0 : p.minimum;
+                        const max = p.maximum === undefined ? 1 : p.maximum;
+                        row.condition.minimum = min;
+                        row.condition.maximum = max;
+                        this.findWidget(`m_min_${i}`).setText(
+                            FHB_formatValue(min),
+                        );
+                        this.findWidget(`m_max_${i}`).setText(
+                            FHB_formatValue(max),
+                        );
+                        reset++;
+                    } catch (e) {
+                        studio.system.message(
+                            `Failed to reset condition ${i + 1}: ${e.message}`,
+                        );
+                    }
+                });
+                studio.system.message(
+                    `Reset ${reset} condition(s) to full parameter range.`,
+                );
+            },
+        });
+
+        studio.ui.showModalDialog({
+            windowTitle: "Edit Transition Condition Values",
+            windowWidth: 420,
+            windowHeight: 100 + rows.length * 28,
+            widgetType: studio.ui.widgetType.Layout,
+            layout: studio.ui.layoutType.GridLayout,
+            sizePolicy: studio.ui.sizePolicy.Fixed,
+            items,
         });
     },
 });
