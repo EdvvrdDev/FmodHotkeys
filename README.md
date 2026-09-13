@@ -36,11 +36,11 @@ Advanced users can skip the installer entirely - FMOD's own documentation explai
 
 ![Color Renamer](GifsExamples/ColorRenamer.gif)
 
-- **Project Actions** (`FmodHotkeys_ProjectActions.js`) - refresh assets, save + build all platforms in one key
 - **Bank & Parameter Organization** (`NOM_*.js`) - add single or multiple events to banks, create banks, and a quick labelled parameter generator
 
 ![Assign Events To Bank](GifsExamples/AssignEventsToBank.gif)
 
 ![Quick Parameter](GifsExamples/QuickParameter.gif)
 
+- **Project Actions** (`FmodHotkeys_ProjectActions.js`) - refresh assets, save + build all platforms in one key
 - **Developer Tools** (`ObjectIdentifier.js`) - dump the structure of any selected object into the console
