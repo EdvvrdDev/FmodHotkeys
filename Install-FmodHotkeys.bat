@@ -10,6 +10,9 @@ if not exist "%DEST%" (
 )
 
 echo Copying scripts to "%DEST%"
+rem Clean first so renamed/removed scripts don't linger and keep
+rem registering old hotkeys (e.g. duplicate Alt+C bindings)
+del /Q "%DEST%\*.js"
 copy /Y "%~dp0*.js" "%DEST%"
 
 echo.

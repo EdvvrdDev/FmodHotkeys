@@ -7,7 +7,7 @@
 - **Shift + T** — Create transition regions from the current selection(s)
 - **Shift + D** — Create destination regions from the current selection(s)
 - **Ctrl + Shift + D** — Create destination markers at the start of the selection(s)
-- All region hotkeys work on multiple selected ranges at once — and from any browser tab (Events *or* Assets)
+- All region hotkeys work on multiple selected ranges at once — and from any browser tab (Events *or* Assets). Selections may mix types: instruments are used directly, markers/regions are anchored at their position, and unpositionable elements (tracks, automation points) are skipped instead of failing the run
 
 ## Event Creation
 

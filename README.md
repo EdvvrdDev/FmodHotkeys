@@ -17,10 +17,30 @@ Advanced users can skip the installer entirely - FMOD's own documentation explai
 ## Script Showcase
 
 - **Timeline Regions & Markers** (`FmodHotkeys_Regions.js`) - loop, magnet, transition and destination regions plus destination markers, created from your timeline selection in one press
+
+![Regions](GifsExamples/Regions.gif)
+
 - **Event Creation** (`FmodHotkeys_NewEvents.js`) - new events with timeline or action sheets already set up
+
+![New Events](GifsExamples/New%20Events.gif)
+
 - **Transition Editing** (`FmodHotkeys_BatchEditTransitions.js`) - batch re-target transitions, add/edit/clear parameter conditions, switch AND/OR trigger logic, and tweak condition values directly
+
+![Batch Transition Edit](GifsExamples/BatchTransitionEdit.gif)
+
 - **Timeline Navigation** (`FmodHotkeys_TabToNextInstrument.js`) - Pro Tools-style cursor snapping to the next instrument start (Tab) and previous instrument end (Shift+Tab)
-- **Selection Organization** (`FmodHotkeys_Colors.js`, `FmodHotkeys_Rename.js`) - contrasting colors for any selection, and an upgraded batch rename dialog with engine-safe transforms and incremental numbering
+
+![Tab Snap](GifsExamples/TabSnap.gif)
+
+- **Selection Organization** (`FmodHotkeys_RandomColor.js`, `FmodHotkeys_Rename.js`) - contrasting colors for any selection, and an upgraded batch rename dialog with engine-safe transforms and incremental numbering
+
+![Color Renamer](GifsExamples/ColorRenamer.gif)
+
 - **Project Actions** (`FmodHotkeys_ProjectActions.js`) - refresh assets, save + build all platforms in one key
 - **Bank & Parameter Organization** (`NOM_*.js`) - add single or multiple events to banks, create banks, and a quick labelled parameter generator
+
+![Assign Events To Bank](GifsExamples/AssignEventsToBank.gif)
+
+![Quick Parameter](GifsExamples/QuickParameter.gif)
+
 - **Developer Tools** (`ObjectIdentifier.js`) - dump the structure of any selected object into the console

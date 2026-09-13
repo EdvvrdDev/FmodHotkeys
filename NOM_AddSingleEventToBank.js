@@ -9,15 +9,23 @@
 studio.menu.addMenuItem({
     name: "FMOD Hotkeys\\NOM\\AddSingleEventToBank",
     keySequence: "Ctrl+B",
-    execute: function () {
+    execute: () => {
         //select the event in the browser
-       var event = studio.window.browserCurrent();
+        var event = studio.window.browserCurrent();
 
-       // Prompt the user for the bank path
-       var bankPath = studio.system.getText("Enter the bank path:", "bank:/Master");
-
-       if (!event) {
+        if (!event) {
             studio.system.message("No event selected in the browser.");
+            return;
+        }
+
+        // Prompt the user for the bank path
+        var bankPath = studio.system.getText(
+            "Enter the bank path:",
+            "bank:/Master",
+        );
+
+        // getText returns null when the user cancels - bail out silently
+        if (!bankPath) {
             return;
         }
 
@@ -34,5 +42,5 @@ studio.menu.addMenuItem({
         } catch (e) {
             studio.system.message("Error adding bank to event: " + e.message);
         }
-    }
+    },
 });

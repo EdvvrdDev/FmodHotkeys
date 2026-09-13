@@ -1,5 +1,5 @@
 /* -------------------------------------------
-   FMOD Hotkeys - Assign Contrasting Colors
+   FMOD Hotkeys - RandomColor
    Assigns a different color to every selected
    item that can be colored (folders, events,
    tracks, instruments, ...).
@@ -40,7 +40,7 @@ function FHC_assignContrastingColors(items) {
 }
 
 studio.menu.addMenuItem({
-    name: "FMOD Hotkeys\\Assign Contrasting Colors",
+    name: "FMOD Hotkeys\\RandomColor",
     keySequence: "Alt+C",
     isEnabled: () =>
         studio.window.browserSelection().length > 0 ||

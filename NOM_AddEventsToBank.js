@@ -207,6 +207,9 @@ function execute() {
                 onAccepted: () => {
                     // spare for extra logic
                 },
+                onRejected: () => {
+                    // Cancel pressed - nothing to do, just close cleanly
+                },
             });
         } else {
             console.error("Error: no events selected.");
